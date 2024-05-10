@@ -1,7 +1,7 @@
 export const drawRect = (detections, ctx)=>{
     detections.forEach(prediction=>{
         const [x,y,width,height] = prediction['bbox'];
-        const text =prediction['class'];
+        const text =prediction['class']+" "+prediction['distance'];
 
         const color = "blue"
         ctx.strokeStyle = color;

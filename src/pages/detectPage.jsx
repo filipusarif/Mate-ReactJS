@@ -9,6 +9,8 @@ export default function Index() {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
 
+    const [detections, setDetections] = useState([]);
+
      // Main function
     const runCoco = async () => {
         // 3. TODO - Load network 
@@ -49,11 +51,31 @@ export default function Index() {
     
         // Draw mesh
         const ctx = canvasRef.current.getContext("2d");
-    
+            
         // 5. TODO - Update drawing utility
         // drawSomething(obj, ctx)  
-        drawRect(obj,ctx)
-        }
+        // Hitung dan simpan jarak untuk setiap objek
+        const detectionsWithDistance = obj.map(objItem => {
+            const objectWidth = objItem.bbox[2]; // assuming first object
+            const focalLength = 1000; // example focal length in pixels (you need to calibrate this)
+            const realWidth = 10; // example real width of object in inches
+            const calculatedDistance = (focalLength * realWidth) / objectWidth;
+
+            return {
+                ...objItem,
+                distance: calculatedDistance.toFixed(2)
+            };
+        });
+        console.log(detectionsWithDistance)
+        setDetections(detectionsWithDistance);
+
+        // Gambar kotak pembatas dan tampilkan jarak
+        drawRect(detectionsWithDistance, ctx);
+
+        // console.log(distance);
+    }
+
+        
     };
 
     useEffect(()=>{runCoco()},[]);
