@@ -10,7 +10,11 @@ export default function Index() {
     const canvasRef = useRef(null);
 
     const [detections, setDetections] = useState([]);
+    const [isFrontCamera, setIsFrontCamera] = useState(true);
 
+    const switchCamera = () => {
+        setIsFrontCamera(!isFrontCamera);
+    };
      // Main function
     const runCoco = async () => {
         // 3. TODO - Load network 
@@ -58,7 +62,7 @@ export default function Index() {
         const detectionsWithDistance = obj.map(objItem => {
             const objectWidth = objItem.bbox[2]; // assuming first object
             const focalLength = 1000; // example focal length in pixels (you need to calibrate this)
-            const realWidth = 10; // example real width of object in inches
+            const realWidth = 20; // example real width of object in inches
             const calculatedDistance = (focalLength * realWidth) / objectWidth;
 
             return {
@@ -94,6 +98,7 @@ export default function Index() {
             zindex: 9,
             width: 640,
             height: 480,
+            transform: isFrontCamera ? '' : 'scaleX(-1)'
         }}
         />
 
@@ -111,6 +116,7 @@ export default function Index() {
             height: 480,
         }}
         />
+        <button onClick={switchCamera}>Switch Camera</button>
         </section>
     );
 }
