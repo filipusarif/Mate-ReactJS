@@ -52,6 +52,7 @@ export default function Index() {
         // e.g. const obj = await net.detect(video);
         const obj = await net.detect(video);
         // console.log(obj);
+        
     
         // Draw mesh
         const ctx = canvasRef.current.getContext("2d");
@@ -78,7 +79,6 @@ export default function Index() {
 
         // console.log(distance);
     }
-
         
     };
 
