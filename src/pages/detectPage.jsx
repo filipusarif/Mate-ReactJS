@@ -82,16 +82,13 @@ export default function Index() {
     return (
         <section className="min-h-screen w-screen overflow-x-hidden bg-slate-500">
             <main className='container flex flex-col justify-center items-center gap-3 mx-auto'>
-                <div className={`w-[${widthCam}px] h-[${heighCam}] overflow-hidden flex flex-col justify-center items-center `}>
+                <div className={`w-[${widthCam}px] h-[${heighCam}] overflow-hidden flex flex-col justify-center items-center relative`}>
                     <Webcam
                     ref={webcamRef}
                     muted={true}
                     style={{
-                        position: "relative",
                         marginLeft: "auto",
                         marginRight: "auto",
-                        left: 0,
-                        right: 0,
                         textAlign: "center",
                         zindex: 9,
                         width: widthCam,
@@ -109,9 +106,9 @@ export default function Index() {
                         right: 0,
                         textAlign: "center",
                         zindex: 8,
-                        width: widthCam,
-                        height: heighCam,
+                        
                     }}
+                    className=" w-full h-full"
                     />
                 </div>
                 <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
