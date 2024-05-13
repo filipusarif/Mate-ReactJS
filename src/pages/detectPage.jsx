@@ -9,6 +9,8 @@ export default function Index() {
     const canvasRef = useRef(null);
 
     const [isFrontCamera, setIsFrontCamera] = useState(true);
+    const [widthCam, setWidthCam] = useState(null);
+    const [heighCam, setHeighCam] = useState(null);
 
     // Change Camera Function
     const switchCamera = () => {
@@ -26,7 +28,7 @@ export default function Index() {
         //  Detect Object
         setInterval(() => {
             detect(net);
-        }, 1);
+        }, 100);
     };
 
 
@@ -45,7 +47,9 @@ export default function Index() {
             // Set video width
             webcamRef.current.video.width = videoWidth;
             webcamRef.current.video.height = videoHeight;
-        
+            setHeighCam(videoHeight);
+            setWidthCam(videoWidth);
+
             // Set canvas height and width
             canvasRef.current.width = videoWidth;
             canvasRef.current.height = videoHeight;
@@ -76,38 +80,42 @@ export default function Index() {
     useEffect(()=>{runCoco()},[]);
 
     return (
-        <section className="min-h-screen w-screen flex flex-col justify-center items-center gap-3">
-            <Webcam
-            ref={webcamRef}
-            muted={true} 
-            style={{
-                position: "relative",
-                marginLeft: "auto",
-                marginRight: "auto",
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                zindex: 9,
-                width: 640,
-                height: 480,
-            }}
-            videoConstraints={videoConstraints}
-            />
-            <canvas
-            ref={canvasRef}
-            style={{
-                position: "absolute",
-                marginLeft: "auto",
-                marginRight: "auto",
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                zindex: 8,
-                width: 640,
-                height: 480,
-            }}
-            />
-            <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
+        <section className="min-h-screen w-screen ">
+            <main className='container flex flex-col justify-center items-center gap-3 mx-auto'>
+                <div className={`w-[${widthCam}px] h-[${heighCam}] overflow-hidden flex flex-col justify-center items-center `}>
+                    <Webcam
+                    ref={webcamRef}
+                    muted={true}
+                    style={{
+                        position: "relative",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        left: 0,
+                        right: 0,
+                        textAlign: "center",
+                        zindex: 9,
+                        width: widthCam,
+                        height: heighCam,
+                    }}
+                    videoConstraints={videoConstraints}
+                    />
+                    <canvas
+                    ref={canvasRef}
+                    style={{
+                        position: "absolute",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        left: 0,
+                        right: 0,
+                        textAlign: "center",
+                        zindex: 8,
+                        width: widthCam,
+                        height: heighCam,
+                    }}
+                    />
+                </div>
+                <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
+            </main>
         </section>
     );
 }
