@@ -8,7 +8,7 @@ export default function Index() {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
 
-    const [isFrontCamera, setIsFrontCamera] = useState(true);
+    const [isFrontCamera, setIsFrontCamera] = useState(false);
     const [widthCam, setWidthCam] = useState(null);
     const [heighCam, setHeighCam] = useState(null);
 
@@ -80,7 +80,7 @@ export default function Index() {
     useEffect(()=>{runCoco()},[]);
 
     return (
-        <section className="min-h-screen w-screen ">
+        <section className="min-h-screen w-screen overflow-x-hidden bg-slate-500">
             <main className='container flex flex-col justify-center items-center gap-3 mx-auto'>
                 <div className={`w-[${widthCam}px] h-[${heighCam}] overflow-hidden flex flex-col justify-center items-center `}>
                     <Webcam
@@ -115,6 +115,8 @@ export default function Index() {
                     />
                 </div>
                 <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
+                <p>width : {widthCam}</p>
+                <p>height: {heighCam}</p>
             </main>
         </section>
     );
