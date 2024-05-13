@@ -9,7 +9,7 @@ export default function Index() {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
 
-    const [detections, setDetections] = useState([]);
+    // const [detections, setDetections] = useState([]);
     const [isFrontCamera, setIsFrontCamera] = useState(true);
 
     const switchCamera = () => {
@@ -21,7 +21,7 @@ export default function Index() {
         // e.g. const net = await cocossd.load();
         const net = await cocoSsd.load();
         console.log("Dataset Load");
-        //  Loop and detect hands
+        //  deteksi 
         setInterval(() => {
             detect(net);
         }, 1);
@@ -62,8 +62,8 @@ export default function Index() {
         // Hitung dan simpan jarak untuk setiap objek
         const detectionsWithDistance = obj.map(objItem => {
             const objectWidth = objItem.bbox[2]; // assuming first object
-            const focalLength = 1000; // example focal length in pixels (you need to calibrate this)
-            const realWidth = 20; // example real width of object in inches
+            const focalLength = 1000; // contoh focal length
+            const realWidth = 20; // contoh lebar asli
             const calculatedDistance = (focalLength * realWidth) / objectWidth;
 
             return {
@@ -71,8 +71,8 @@ export default function Index() {
                 distance: calculatedDistance.toFixed(2)
             };
         });
-        console.log(detectionsWithDistance)
-        setDetections(detectionsWithDistance);
+        // console.log(detectionsWithDistance)
+        // setDetections(detectionsWithDistance);
 
         // Gambar kotak pembatas dan tampilkan jarak
         drawRect(detectionsWithDistance, ctx);
@@ -83,13 +83,18 @@ export default function Index() {
     };
 
     useEffect(()=>{runCoco()},[]);
+
+    const videoConstraints = {
+        facingMode: isFrontCamera ? "user" : "environment" // mengganti kamera 
+    };
     return (
-        <section className="h-screen w-screen">
+        <section className="min-h-screen w-screen flex flex-col justify-center items-center gap-3">
+
             <Webcam
         ref={webcamRef}
         muted={true} 
         style={{
-            position: "absolute",
+            position: "relative",
             marginLeft: "auto",
             marginRight: "auto",
             left: 0,
@@ -98,10 +103,9 @@ export default function Index() {
             zindex: 9,
             width: 640,
             height: 480,
-            transform: isFrontCamera ? '' : 'scaleX(-1)'
         }}
+        videoConstraints={videoConstraints}
         />
-
         <canvas
         ref={canvasRef}
         style={{
@@ -116,7 +120,7 @@ export default function Index() {
             height: 480,
         }}
         />
-        <button onClick={switchCamera}>Switch Camera</button>
+        <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
         </section>
     );
 }
