@@ -8,9 +8,12 @@ export default function Index() {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
 
+
     const [isFrontCamera, setIsFrontCamera] = useState(false);
+    const [audioStatus, setAudioStatus] = useState(true);
     const [widthCam, setWidthCam] = useState(null);
     const [heighCam, setHeighCam] = useState(null);
+    const [object, setObject] = useState(null);
 
     // Change Camera Function
     const switchCamera = () => {
@@ -59,12 +62,23 @@ export default function Index() {
             // Draw mesh
             const ctx = canvasRef.current.getContext("2d");
                 
+            let calculatedDistance;
             // Count and save distance each object
             const detectionsWithDistance = obj.map(objItem => {
                 const objectWidth = objItem.bbox[2]; // assuming first object
                 const focalLength = 1000; // focal length
                 const realWidth = 20; //lebar asli
-                const calculatedDistance = (focalLength * realWidth) / objectWidth;
+                calculatedDistance = (focalLength * realWidth) / objectWidth;
+                
+                if(objItem['class']!=object){
+                    setObject(objItem['class']);
+                    if(audioStatus){
+                        audio(calculatedDistance.toFixed(2));
+                        console.log("log")
+                    }else{
+                        speechSynthesis.cancel();
+                    }
+                }
 
                 return {
                     ...objItem,
@@ -74,10 +88,34 @@ export default function Index() {
 
             // Draw Stroke/line and distance
             drawRect(detectionsWithDistance, ctx);
+            
         }
     };
 
     useEffect(()=>{runCoco()},[]);
+
+
+    function activeSound() {
+        setAudioStatus(true);
+    }
+
+    function nonActiveSound() {
+        setAudioStatus(false);
+        speechSynthesis.cancel();
+    }
+
+    const audio = (distance) => {
+        var speechSynthesis = window.speechSynthesis;
+        var speech = new SpeechSynthesisUtterance();
+            // Set the text to be spoken
+            speech.text = "didepan object orang jarak "+distance;
+            speech.lang = 'id-ID';
+            // Use the default speech synthesizer
+            var speechSynthesis = window.speechSynthesis;
+            speechSynthesis.speak(speech);
+    }
+
+    
 
     return (
         <section className="min-h-screen w-screen overflow-x-hidden bg-slate-500">
@@ -112,8 +150,8 @@ export default function Index() {
                     />
                 </div>
                 <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
-                <p>width : {widthCam}</p>
-                <p>height: {heighCam}</p>
+                <button onClick={activeSound}>Audio On</button>
+                <button onClick={nonActiveSound}>Audio Off</button>
             </main>
         </section>
     );
