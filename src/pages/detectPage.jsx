@@ -13,7 +13,10 @@ export default function Index() {
     const [audioStatus, setAudioStatus] = useState(true);
     const [widthCam, setWidthCam] = useState(null);
     const [heighCam, setHeighCam] = useState(null);
-    const [object, setObject] = useState(null);
+    const [objectTarget, setObjectTarget] = useState(null);
+
+    let tempObj = [];
+
 
     // Change Camera Function
     const switchCamera = () => {
@@ -63,6 +66,8 @@ export default function Index() {
             const ctx = canvasRef.current.getContext("2d");
                 
             let calculatedDistance;
+            const object = [];
+            let i=0;
             // Count and save distance each object
             const detectionsWithDistance = obj.map(objItem => {
                 const objectWidth = objItem.bbox[2]; // assuming first object
@@ -70,21 +75,35 @@ export default function Index() {
                 const realWidth = 20; //lebar asli
                 calculatedDistance = (focalLength * realWidth) / objectWidth;
                 
-                if(objItem['class']!=object){
-                    setObject(objItem['class']);
-                    if(audioStatus){
-                        audio(calculatedDistance.toFixed(2));
-                        console.log("log")
-                    }else{
-                        speechSynthesis.cancel();
-                    }
-                }
-
+                object[i] = objItem['class']
+                i++;
+                
                 return {
                     ...objItem,
                     distance: calculatedDistance.toFixed(2)
                 };
             });
+
+            if(JSON.stringify(tempObj) != JSON.stringify(object)){
+                let index=0;
+                tempObj = [];
+                object.map(objItem => {
+                    tempObj[index] = objItem;
+                    index++;
+                })
+                if(audioStatus){
+                    audio(calculatedDistance.toFixed(2));
+                    console.log(object)
+                    console.log(tempObj)
+                }else{
+                    speechSynthesis.cancel();
+                }
+                
+            }else{
+                if(!audioStatus){
+                    speechSynthesis.cancel();
+                }
+            }
 
             // Draw Stroke/line and distance
             drawRect(detectionsWithDistance, ctx);
