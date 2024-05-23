@@ -14,8 +14,10 @@ export default function Index() {
     const [widthCam, setWidthCam] = useState(null);
     const [heighCam, setHeighCam] = useState(null);
     const [objectTarget, setObjectTarget] = useState(null);
+    let count=0;
 
-    let tempObj = [];
+
+    let tempObj = 0;
 
 
     // Change Camera Function
@@ -66,8 +68,8 @@ export default function Index() {
             const ctx = canvasRef.current.getContext("2d");
                 
             let calculatedDistance;
-            const object = [];
-            let i=0;
+            let object=0;
+
             // Count and save distance each object
             const detectionsWithDistance = obj.map(objItem => {
                 const objectWidth = objItem.bbox[2]; // assuming first object
@@ -75,8 +77,7 @@ export default function Index() {
                 const realWidth = 20; //lebar asli
                 calculatedDistance = (focalLength * realWidth) / objectWidth;
                 
-                object[i] = objItem['class']
-                i++;
+                object++;
                 
                 return {
                     ...objItem,
@@ -84,30 +85,28 @@ export default function Index() {
                 };
             });
 
-            if(JSON.stringify(tempObj) != JSON.stringify(object)){
-                let index=0;
-                tempObj = [];
-                object.map(objItem => {
-                    tempObj[index] = objItem;
-                    index++;
-                })
-                if(audioStatus){
-                    audio(calculatedDistance.toFixed(2));
-                    console.log(object)
-                    console.log(tempObj)
+            
+                if(tempObj != object && count % 50 == 0){
+                    
+                    tempObj = object;
+                    if(audioStatus){
+                        audio(calculatedDistance.toFixed(2));
+                        console.log(object)
+                        console.log(tempObj)
+                    }else{
+                        speechSynthesis.cancel();
+                    }
+                    
                 }else{
-                    speechSynthesis.cancel();
+                    if(!audioStatus){
+                        speechSynthesis.cancel();
+                    }
                 }
-                
-            }else{
-                if(!audioStatus){
-                    speechSynthesis.cancel();
-                }
-            }
+            
 
+            count++;
             // Draw Stroke/line and distance
             drawRect(detectionsWithDistance, ctx);
-            
         }
     };
 
