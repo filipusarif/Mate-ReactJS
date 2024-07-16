@@ -24,7 +24,7 @@ function App() {
                 formData.append('file', blob, 'frame.jpg');
 
                 try {
-                    const response = await axios.post('https://9b02-103-119-66-20.ngrok-free.app/detect/', formData, {
+                    const response = await axios.post('https://anemone-busy-sunfish.ngrok-free.app/detect/', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
