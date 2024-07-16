@@ -17,7 +17,7 @@ export default function Index() {
     let count=0;
 
 
-    let tempObj = 0;
+    let tempObj = 0, tempDistance=0;
 
 
     // Change Camera Function
@@ -43,9 +43,9 @@ export default function Index() {
     const detect = async (net) => {
         // Check data is available
         if (
-        typeof webcamRef.current !== "undefined" &&
-        webcamRef.current !== null &&
-        webcamRef.current.video.readyState === 4
+            typeof webcamRef.current !== "undefined" &&
+            webcamRef.current !== null &&
+            webcamRef.current.video.readyState === 4
         ) {
             // Get Video Properties
             const video = webcamRef.current.video;
@@ -69,14 +69,20 @@ export default function Index() {
                 
             let calculatedDistance;
             let object=0;
-
+            let minDistance=100000, minClass , iTemp=0;
             // Count and save distance each object
             const detectionsWithDistance = obj.map(objItem => {
                 const objectWidth = objItem.bbox[2]; // assuming first object
                 const focalLength = 1000; // focal length
                 const realWidth = 20; //lebar asli
                 calculatedDistance = (focalLength * realWidth) / objectWidth;
-                
+
+                if(minDistance > calculatedDistance){
+                    minDistance = calculatedDistance.toFixed(0);
+                    minClass = objItem['class'];
+                }
+
+                iTemp++;
                 object++;
                 
                 return {
@@ -85,14 +91,16 @@ export default function Index() {
                 };
             });
 
-            
+                
                 if(tempObj != object && count % 50 == 0){
                     
                     tempObj = object;
                     if(audioStatus){
-                        audio(calculatedDistance.toFixed(2));
+                        audio(calculatedDistance.toFixed(2), minDistance, minClass);
                         console.log(object)
                         console.log(tempObj)
+                        console.log(audioStatus)
+                        console.log(minClass)
                     }else{
                         speechSynthesis.cancel();
                     }
@@ -122,11 +130,10 @@ export default function Index() {
         speechSynthesis.cancel();
     }
 
-    const audio = (distance) => {
-        var speechSynthesis = window.speechSynthesis;
-        var speech = new SpeechSynthesisUtterance();
+    const audio = (distance, minDistance, minClass) => {
+            var speech = new SpeechSynthesisUtterance();
             // Set the text to be spoken
-            speech.text = "didepan object orang jarak "+distance;
+            speech.text = "didepan ada"+ minClass +" terdekat jarak "+ minDistance + "sentimenter";
             speech.lang = 'id-ID';
             // Use the default speech synthesizer
             var speechSynthesis = window.speechSynthesis;

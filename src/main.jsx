@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import {createBrowserRouter,RouterProvider} from "react-router-dom";
 import './index.css'
-import Detect from './pages/detectPage.jsx'
+import Detect from './pages/detectPageAPI.jsx'
 
 const router = createBrowserRouter([
   {
