@@ -5,6 +5,7 @@ function App() {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [detections, setDetections] = useState([]);
+    const [story, setStory] = useState('');
 
     useEffect(() => {
         const constraints = {
@@ -24,21 +25,29 @@ function App() {
                 formData.append('file', blob, 'frame.jpg');
 
                 try {
-                    const response = await axios.post('https://anemone-busy-sunfish.ngrok-free.app/detect/', formData, {
+                    // Production
+                    // const response = await axios.post('https://anemone-busy-sunfish.ngrok-free.app/detect/', formData, {
+                    //     headers: {
+                    //         'Content-Type': 'multipart/form-data',
+                    //     },
+                    // });
+                    
+                    // Development
+                    const response = await axios.post('http://127.0.0.1:8000/detect/', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                    setDetections(response.data);
-                    drawDetections(response.data, context);
-                    console.log(response.data); // Log the detections to the console
+                    setDetections(response.data.detections);
+                    setStory(response.data.story);
+                    drawDetections(response.data.detections, context);
                 } catch (error) {
                     console.error('Error uploading frame:', error);
                 }
             }, 'image/jpeg');
         };
 
-        const intervalId = setInterval(sendFrame, 1000); // Send frame every second
+        const intervalId = setInterval(sendFrame, 10000); // Send frame every second
         return () => clearInterval(intervalId);
     }, []);
 
@@ -59,12 +68,17 @@ function App() {
         <div className="App">
             <h1>Object Detection</h1>
             <video ref={videoRef} autoPlay width="640" height="480"></video>
-            <canvas ref={canvasRef} width="640" height="480" ></canvas>
             <div>
+                <h2>Story:</h2>
+                <p>{story}</p>
+            </div>
+            <canvas ref={canvasRef} width="640" height="480" ></canvas>
+            {/* <div>
                 {detections.map((det, index) => (
                     <p key={index}>{`${det.name} (${det.confidence.toFixed(2)})`}</p>
                 ))}
-            </div>
+            </div> */}
+            
         </div>
     );
 }
