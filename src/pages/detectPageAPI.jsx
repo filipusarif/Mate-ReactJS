@@ -29,18 +29,18 @@ function App() {
 
                 try {
                     // Production
-                    // const response = await axios.post('https://anemone-busy-sunfish.ngrok-free.app/detect/', formData, {
-                    //     headers: {
-                    //         'Content-Type': 'multipart/form-data',
-                    //     },
-                    // });
-                    
-                    // Development
-                    const response = await axios.post('http://127.0.0.1:8000/detect/', formData, {
+                    const response = await axios.post('https://anemone-busy-sunfish.ngrok-free.app/detect/', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
+                    
+                    // Development
+                    // const response = await axios.post('http://127.0.0.1:8000/detect/', formData, {
+                    //     headers: {
+                    //         'Content-Type': 'multipart/form-data',
+                    //     },
+                    // });
                     setDetections(response.data.detections);
                     setStory(response.data.story);
                     drawDetections(response.data.detections, context);
