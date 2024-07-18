@@ -8,9 +8,12 @@ function App() {
     const [story, setStory] = useState('');
 
     useEffect(() => {
+        
         const constraints = {
             video: true,
         };
+
+        
 
         navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
             videoRef.current.srcObject = stream;
@@ -41,15 +44,37 @@ function App() {
                     setDetections(response.data.detections);
                     setStory(response.data.story);
                     drawDetections(response.data.detections, context);
+                    console.log(response.data.detections);
                 } catch (error) {
                     console.error('Error uploading frame:', error);
                 }
             }, 'image/jpeg');
         };
+        
+        
 
         const intervalId = setInterval(sendFrame, 10000); // Send frame every second
         return () => clearInterval(intervalId);
     }, []);
+
+    useEffect(() => {
+        speakStory('Anda berada di halaman deteksi');
+    }, []);
+
+    useEffect(() => {
+        
+        if (story) {
+            speakStory(story);
+        }
+    }, [story]);
+
+    const speakStory = (text) => {
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'id-ID';
+        speech.pitch = 1;
+        speech.rate = 1;
+        window.speechSynthesis.speak(speech);
+    };
 
     const drawDetections = (detections, context) => {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -64,6 +89,10 @@ function App() {
         });
     };
 
+    
+
+    // document.addEventListener('DOMContentLoaded', speakStory("anda di halaman deteksi"));
+
     return (
         <div className="App">
             <h1>Object Detection</h1>
@@ -72,6 +101,7 @@ function App() {
                 <h2>Story:</h2>
                 <p>{story}</p>
             </div>
+            <canvas ref={canvasRef} width="640" height="480" style={{ display:'none' }}></canvas>
             <canvas ref={canvasRef} width="640" height="480" ></canvas>
             {/* <div>
                 {detections.map((det, index) => (
