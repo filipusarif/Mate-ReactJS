@@ -62,7 +62,7 @@ function App() {
 
         const intervalId = setInterval(sendFrame, 15000); // Send frame every 10 seconds
         return () => clearInterval(intervalId);
-    }, [isFrontCamera]);
+    }, []);
 
     useEffect(() => {
         if (!hasSpokenRef.current) {
