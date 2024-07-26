@@ -12,6 +12,8 @@ function App() {
     const requestRef = useRef(null);
     const hasSpokenRef = useRef(false);
     const typingSpeed = 80;
+    // const api = 'http://127.0.0.1:8000/detect/';
+    const api = 'https://blindsens.vercel.app/';
 
     const recognitionRef = useRef(null);
     const [isRecognizing, setIsRecognizing] = useState(false);
@@ -61,7 +63,7 @@ function App() {
             formData.append('file', blob, 'frame.jpg');
 
             try {
-                const response = await axios.post('http://127.0.0.1:8000/detect/', formData, {
+                const response = await axios.post(api, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
