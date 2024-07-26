@@ -111,32 +111,36 @@ function App() {
             alert('Speech Recognition API not supported in this browser.');
             return;
         }
-
+    
         recognitionRef.current = new window.webkitSpeechRecognition();
         recognitionRef.current.lang = 'id-ID';
         recognitionRef.current.continuous = false;
         recognitionRef.current.interimResults = false;
-
+    
         recognitionRef.current.onstart = () => {
             setIsRecognizing(true);
         };
-
+    
         recognitionRef.current.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             console.log('Recognized text:', transcript);
             setRecognizedText(transcript);
         };
-
+    
         recognitionRef.current.onerror = (event) => {
             console.error('Speech recognition error', event.error);
+            if (event.error === 'no-speech') {
+                alert('No speech detected. Please try again.');
+            }
         };
-
+    
         recognitionRef.current.onend = () => {
             setIsRecognizing(false);
         };
-
+    
         recognitionRef.current.start();
     };
+    
 
     const stopRecognition = () => {
         if (recognitionRef.current) {
