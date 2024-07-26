@@ -7,6 +7,7 @@ function App() {
     const [detections, setDetections] = useState([]);
     const [story, setStory] = useState('');
     const [isFrontCamera, setIsFrontCamera] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // State to manage loading status
     const hasSpokenRef = useRef(false);
     const typingSpeed = 80;
 
@@ -22,12 +23,12 @@ function App() {
     };
 
     useEffect(() => {
-        
-
         navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
             videoRef.current.srcObject = stream;
+            setIsLoading(false); // Set loading to false once the stream is ready
         }).catch((error) => {
             console.error('Error accessing camera:', error);
+            setIsLoading(false); // Set loading to false even if there's an error
         });
 
         const sendFrame = () => {
@@ -62,16 +63,16 @@ function App() {
             }, 'image/jpeg');
         };
 
-        const intervalId = setInterval(sendFrame, 15000); // Send frame every 10 seconds
+        const intervalId = setInterval(sendFrame, 15000); // Send frame every 15 seconds
         return () => clearInterval(intervalId);
-    }, []);
+    }, [isFrontCamera]);
 
     useEffect(() => {
-        if (!hasSpokenRef.current) {
+        if (!isLoading && !hasSpokenRef.current) {
             speakStory('Anda berada di halaman deteksi');
             hasSpokenRef.current = true;
         }
-    }, []);
+    }, [isLoading]);
 
     useEffect(() => {
         if (story) {
@@ -102,14 +103,23 @@ function App() {
 
     return (
         <div className="App">
-            <h1>Object Detection</h1>
-            <video ref={videoRef} autoPlay width="640" height="480"></video>
-            <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
-            <div>
-                <h2>Story:</h2>
-                <Typewriter text={story} delay={typingSpeed} />
-            </div>
-            <canvas ref={canvasRef} width="640" height="480" style={{ display:'none' }}></canvas>
+            {isLoading ? (
+                <div className="loading">
+                    <p>Loading...</p>
+                    {/* Add any loading animation here */}
+                </div>
+            ) : (
+                <>
+                    <h1>Object Detection</h1>
+                    <video ref={videoRef} autoPlay width="640" height="480"></video>
+                    <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
+                    <div>
+                        <h2>Story:</h2>
+                        <Typewriter text={story} delay={typingSpeed} />
+                    </div>
+                    <canvas ref={canvasRef} width="640" height="480" style={{ display:'none' }}></canvas>
+                </>
+            )}
         </div>
     );
 }
