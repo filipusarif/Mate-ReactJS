@@ -13,7 +13,7 @@ function App() {
     const hasSpokenRef = useRef(false);
     const typingSpeed = 80;
     // const api = 'http://127.0.0.1:8000/detect/';
-    const api = 'https://blindsens.vercel.app/';
+    const api = 'https://anemone-busy-sunfish.ngrok-free.app/detect/';
 
     const recognitionRef = useRef(null);
     const [isRecognizing, setIsRecognizing] = useState(false);
