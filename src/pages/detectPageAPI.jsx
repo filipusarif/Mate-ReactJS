@@ -38,7 +38,7 @@ function App() {
             console.error('Error accessing camera:', error);
             setIsLoading(false); 
         });
-    }, [isFrontCamera]);
+    }, []);
 
     useEffect(() => {
         if (!isLoading && !hasSpokenRef.current) {
