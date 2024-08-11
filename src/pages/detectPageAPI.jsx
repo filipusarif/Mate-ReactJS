@@ -12,14 +12,11 @@ function App() {
     const requestRef = useRef(null);
     const hasSpokenRef = useRef(false);
     const typingSpeed = 80;
-    // const api = 'http://127.0.0.1:8000/detect/';
-    const api = 'https://anemone-busy-sunfish.ngrok-free.app/detect/';
-
+    const api = 'http://127.0.0.1:8000/detect/';
     const recognitionRef = useRef(null);
     const [isRecognizing, setIsRecognizing] = useState(false);
     const [recognizedText, setRecognizedText] = useState('');
 
-    // Change Camera Function
     const switchCamera = () => {
         setIsFrontCamera(!isFrontCamera);
     };
@@ -38,7 +35,7 @@ function App() {
             console.error('Error accessing camera:', error);
             setIsLoading(false); 
         });
-    }, [isFrontCamera]);
+    }, []);
 
     useEffect(() => {
         if (!isLoading && !hasSpokenRef.current) {
@@ -126,14 +123,12 @@ function App() {
         recognitionRef.current.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             console.log('Recognized text:', transcript);
+            handleCommand(transcript);
             setRecognizedText(transcript);
         };
     
         recognitionRef.current.onerror = (event) => {
             console.error('Speech recognition error', event.error);
-            if (event.error === 'no-speech') {
-                alert('No speech detected. Please try again.');
-            }
         };
     
         recognitionRef.current.onend = () => {
@@ -143,10 +138,46 @@ function App() {
         recognitionRef.current.start();
     };
     
-
     const stopRecognition = () => {
         if (recognitionRef.current) {
             recognitionRef.current.stop();
+        }
+    };
+
+    const handleCommand = (command) => {
+        if (command.toLowerCase().startsWith('mate')) {
+            const action = command.slice(5).trim().toLowerCase();
+            if (action === 'pindah halaman') {
+                // Contoh: Pindah ke halaman lain
+                window.location.href = 'https://example.com'; // Ganti dengan URL tujuan
+            }
+        }
+        if (command.toLowerCase().startsWith('cari')) {
+            // Lakukan pencarian Google atau tugas lain
+            searchGoogle(command);
+        }
+        else {
+            // chat bot
+        }
+    };
+
+    const searchGoogle = async (query) => {
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/search/`, {
+                params: {
+                    query: query
+                }
+            });
+            const { answer } = response.data;
+            if (answer) {
+                speakStory(`Saya menemukan ini di Google: ${answer}.`);
+                console.log(answer);
+            } else {
+                speakStory('Maaf, saya tidak menemukan informasi yang relevan.');
+            }
+        } catch (error) {
+            console.error('Error during Google search:', error);
+            speakStory('Maaf, terjadi kesalahan saat melakukan pencarian.');
         }
     };
 
@@ -168,7 +199,6 @@ function App() {
             {isLoading ? (
                 <div className="loading">
                     <p>Loading...</p>
-                    {/* Add any loading animation here */}
                 </div>
             ) : (
                 <>
