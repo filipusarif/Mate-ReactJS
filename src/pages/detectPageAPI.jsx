@@ -331,7 +331,7 @@ function App() {
                 </main>
                 <main className='hidden  w-full h-screen md:flex justify-between items-center'>
                     <div className='relative w-[70%] h-screen overflow-hidden'>
-                        <video ref={videoRef} autoPlay playsInline width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video>
+                        {/* <video ref={videoRef} autoPlay playsInline width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video> */}
                         <MapContainer 
                             center={[51.505, -0.09]} 
                             zoom={18} 
