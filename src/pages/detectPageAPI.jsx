@@ -262,6 +262,15 @@ function App() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [story]);
 
+    const [menu, setMenu] = useState(true);
+    
+    const toDetectionMenu =() =>{
+        setMenu(true);
+    }
+
+    const toNavigationMenu = () => {
+        setMenu(false);
+    }
     return (
         <div className="App">
             {isLoading ? (
@@ -269,9 +278,60 @@ function App() {
                     <p>Loading...</p>
                 </div>
             ) : (
-                <main className='w-full h-screen flex justify-between items-center'>
+                <div>
+                <main className='block relative md:hidden'>
+                    <menu className=' bg-blue-500 w-full fixed h-[50px] flex justify-center gap-5 text-white '>
+                        <button className=' cursor-pointer' onClick={toDetectionMenu}>detection</button>
+                        <button className='cursor-pointer' onClick={toNavigationMenu}>navigation</button>
+                    </menu>
+                    <div className="container pt-12  w-full h-screen">
+                        {menu ? 
+                        <div className='bg-gray-200'>
+                            <video ref={videoRef} autoPlay playsInline  width="full" height="full" className='bg-red-500'></video>
+                        </div>
+                        :
+                        <div>
+                            <MapContainer 
+                                center={[51.505, -0.09]} 
+                                zoom={18} 
+                                scrollWheelZoom={true} 
+                                style={{ height: '60%', width: '100%' , position:'absolute',zIndex:'0'}}
+                            >
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                <LocateUser /> 
+                            </MapContainer>
+                        </div>}
+                        <div className='absolute bg-slate-200 w-full h-[40vh] bottom-0 rounded-t-lg flex flex-col'>
+                            <div className='h-[80%] w-full'>
+                                {story.map((message, index) => (
+                                    <div
+                                        key={index}
+                                        className={`mb-2 p-3 rounded-lg shadow ${
+                                            message.type === 'system'
+                                                ? 'bg-gray-300 text-left'
+                                                : 'bg-blue-500 text-white text-right'
+                                        }`}
+                                    >
+                                        <Typewriter text={message.text} delay={typingSpeed} />
+                                    </div>
+                                ))}
+                                <div ref={messagesEndRef} />
+                                {isRecognizing && <div className='w-full h-full grid place-items-center'>Speak</div>}
+                            </div>
+                            <div className='flex justify-center gap-5 w-full'>
+                                <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
+                                <button onClick={toggleFunctions} className='bg-green-500 text-white px-5 py-3 rounded-lg'>{isActive ? 'Stop' : 'Start'}</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </main>
+                <main className='hidden  w-full h-screen md:flex justify-between items-center'>
                     <div className='relative w-[70%] h-screen overflow-hidden'>
-                        <video ref={videoRef} autoPlay width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video>
+                        <video ref={videoRef} autoPlay playsInline width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video>
                         <MapContainer 
                             center={[51.505, -0.09]} 
                             zoom={18} 
@@ -316,10 +376,12 @@ function App() {
                     </div>
                     <canvas ref={canvasRef} width="640" height="480" style={{ display:'none' }}></canvas>
                 </main>
+                </div>
             )}
         </div>
     );
 }
+
 
 const Typewriter = ({ text, delay }) => {
     const [currentText, setCurrentText] = useState('');
