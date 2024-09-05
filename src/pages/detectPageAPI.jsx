@@ -1,5 +1,38 @@
 import React, { useRef, useEffect, useState } from 'react';
 import axios from 'axios';
+import { MapContainer, TileLayer, useMap, Marker, Popup, Circle } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Komponen untuk menemukan lokasi saat ini
+function LocateUser() {
+    const map = useMap();
+
+    useEffect(() => {
+        map.locate({
+            setView: true,    // Mengatur peta untuk fokus ke posisi pengguna
+            maxZoom: 18,      // Mengatur zoom maksimal lebih dekat
+            enableHighAccuracy: true, // Meminta akurasi tinggi
+        });
+
+        // Event listener untuk lokasi ditemukan
+        map.on('locationfound', (e) => {
+            const radius = e.accuracy; // Mendapatkan radius akurasi posisi
+
+            // Menambahkan Marker atau Circle untuk menunjukkan lokasi
+            L.marker(e.latlng).addTo(map)
+                .bindPopup(`You are within ${radius.toFixed(1)} meters from this point`).openPopup();
+
+            L.circle(e.latlng, { radius }).addTo(map); // Menambahkan lingkaran untuk akurasi
+        });
+
+        // Event listener untuk lokasi tidak ditemukan
+        map.on('locationerror', () => {
+            alert("Location access denied.");
+        });
+    }, [map]);
+
+    return null; // Tidak perlu render apa-apa karena hanya untuk fungsi
+}
 
 function App() {
     const videoRef = useRef(null);
@@ -237,10 +270,22 @@ function App() {
                 </div>
             ) : (
                 <main className='w-full h-screen flex justify-between items-center'>
-                    <div className='relative w-[70%] h-screen'>
-                        <video ref={videoRef} autoPlay width="200" height="120" className='absolute left-0 m-5 rounded-md'></video>
-                        //map
+                    <div className='relative w-[70%] h-screen overflow-hidden'>
+                        <video ref={videoRef} autoPlay width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video>
+                        <MapContainer 
+                            center={[51.505, -0.09]} 
+                            zoom={18} 
+                            scrollWheelZoom={true} 
+                            style={{ height: '100%', width: '100%' , position:'absolute',zIndex:'0'}}
+                        >
+                            <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            <LocateUser /> {/* Komponen untuk menemukan lokasi pengguna */}
+                        </MapContainer>
                     </div>
+
                     <div className='w-[30%] h-screen bg-slate-200 flex flex-col items-center justify-around'>
                         <div>
                             <h2>Story:</h2>
