@@ -50,6 +50,31 @@ function App() {
     const [isRecognizing, setIsRecognizing] = useState(false);
     const [recognizedText, setRecognizedText] = useState('');
     const messagesEndRef = useRef(null);
+    const [isPushToTalkActive, setIsPushToTalkActive] = useState(false);
+
+    const [isHeld, setIsHeld] = useState(false);
+    const holdTimeoutRef = useRef(null); // Menggunakan useRef untuk menyimpan timeout
+
+    // Fungsi untuk memulai push to talk setelah 1 detik
+    const handleMouseDown = () => {
+    holdTimeoutRef.current = setTimeout(() => {
+        setIsHeld(true); // Menandakan bahwa tombol di-hold lebih dari 1 detik
+        toggleFunctions(true); // Aktifkan push to talk
+    }, 1000); // Set delay ke 1 detik
+    };
+
+    // Fungsi untuk menghentikan push to talk saat mouse dilepas
+    const handleMouseUp = () => {
+    if (holdTimeoutRef.current) {
+        clearTimeout(holdTimeoutRef.current); // Hentikan timer jika dilepas sebelum 1 detik
+    }
+    
+    if (isHeld) {
+        setIsHeld(false); // Reset flag jika sudah di-hold lebih dari 1 detik
+        toggleFunctions(false); // Nonaktifkan push to talk
+    }
+    };
+
 
     const switchCamera = () => {
         setIsFrontCamera(!isFrontCamera);
@@ -133,6 +158,8 @@ function App() {
         return () => clearTimeout(requestRef.current); 
     }, [isActive]);
 
+    
+
     const speakStory = (text) => {
         if (isActive) {
             const speech = new SpeechSynthesisUtterance(text);
@@ -143,15 +170,27 @@ function App() {
         }
     };
 
-    const toggleFunctions = () => {
-        setIsActive(!isActive);
-        if (isActive) {
-            window.speechSynthesis.cancel();
-            startRecognition();
+    // const toggleFunctions = () => {
+    //     setIsActive(!isActive);
+    //     if (isActive) {
+    //         window.speechSynthesis.cancel();
+    //         startRecognition();
+    //     } else {
+    //         stopRecognition();
+    //     }
+    // };
+
+    const toggleFunctions = (isPressing) => {
+        if (isPressing) {
+          setIsPushToTalkActive(true);
+          window.speechSynthesis.cancel();
+          startRecognition();
         } else {
-            stopRecognition();
+          setIsPushToTalkActive(false);
+          stopRecognition();
         }
-    };
+      };
+      
 
     const startRecognition = () => {
         if (!('webkitSpeechRecognition' in window)) {
@@ -193,11 +232,11 @@ function App() {
     };
 
     const handleCommand = (command) => {
-        if (command.toLowerCase().startsWith('mate')) {
+        if (command.toLowerCase().startsWith('kawan')) {
             const action = command.slice(5).trim().toLowerCase();
-            if (action === 'pindah halaman') {
+            if (action === 'pindah halaman beranda.') {
+                window.location.href = '/home'; // Ganti dengan URL tujuan
                 // Contoh: Pindah ke halaman lain
-                window.location.href = 'https://example.com'; // Ganti dengan URL tujuan
             }
         } else if (command.toLowerCase().startsWith('cari')) {
             const action = command.slice(5).trim().toLowerCase();
@@ -272,7 +311,9 @@ function App() {
         setMenu(false);
     }
     return (
-        <div className="App">
+        <div className="App"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}>
             {isLoading ? (
                 <div className="loading">
                     <p>Loading...</p>
@@ -287,7 +328,7 @@ function App() {
                     <div className="container pt-12  w-full h-screen">
                         {menu ? 
                         <div className='bg-gray-200'>
-                            <video ref={videoRef} autoPlay playsInline  width="full" height="full" className='bg-red-500'></video>
+                            {/* <video ref={videoRef} autoPlay playsInline  width="full" height="full" className='bg-red-500'></video> */}
                         </div>
                         :
                         <div>
@@ -331,7 +372,7 @@ function App() {
                 </main>
                 <main className='hidden  w-full h-screen md:flex justify-between items-center'>
                     <div className='relative w-[70%] h-screen overflow-hidden'>
-                        {/* <video ref={videoRef} autoPlay playsInline width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video> */}
+                        <video ref={videoRef} autoPlay playsInline width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video>
                         <MapContainer 
                             center={[51.505, -0.09]} 
                             zoom={18} 
@@ -369,7 +410,7 @@ function App() {
 
                         <div>
                             <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
-                            <button onClick={toggleFunctions} className='bg-green-500 text-white px-5 py-3 rounded-lg'>{isActive ? 'Stop' : 'Start'}</button>
+                            {/* <button onClick={toggleFunctions} className='bg-green-500 text-white px-5 py-3 rounded-lg'>{isActive ? 'Stop' : 'Start'}</button> */}
                         </div>
                     </div>
                     <div>
