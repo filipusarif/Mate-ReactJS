@@ -234,7 +234,7 @@ function App() {
     const handleCommand = (command) => {
         if (command.toLowerCase().startsWith('kawan')) {
             const action = command.slice(5).trim().toLowerCase();
-            if (action === 'pindah halaman beranda.') {
+            if (action === 'pindah halaman beranda') {
                 window.location.href = '/home'; // Ganti dengan URL tujuan
                 // Contoh: Pindah ke halaman lain
             }
@@ -242,7 +242,7 @@ function App() {
             const action = command.slice(5).trim().toLowerCase();
 
             // Lakukan pencarian Google atau tugas lain
-            searchGoogle(action);
+            searchGoogle("sekarang tanggal berapa");
         } else {
             // chat bot
             // chat(command)
@@ -310,6 +310,26 @@ function App() {
     const toNavigationMenu = () => {
         setMenu(false);
     }
+
+    const isDesktop = useMediaQuery('(min-width: 768px)'); // md adalah 768px
+
+    // Hook untuk mendeteksi media query
+    function useMediaQuery(query) {
+        const [matches, setMatches] = useState(false);
+    
+        useEffect(() => {
+        const media = window.matchMedia(query);
+        if (media.matches !== matches) {
+            setMatches(media.matches);
+        }
+        const listener = () => setMatches(media.matches);
+        window.addEventListener('resize', listener);
+        return () => window.removeEventListener('resize', listener);
+        }, [matches, query]);
+    
+        return matches;
+    }
+
     return (
         <div className="App"
         onMouseDown={handleMouseDown}
@@ -320,7 +340,55 @@ function App() {
                 </div>
             ) : (
                 <div>
-                <main className='block relative md:hidden'>
+                    {isDesktop ? <main className='flex  w-full h-screen justify-between items-center'>
+                    {isRecognizing && <SpeakModal/>}
+                    <div className='relative w-[70%] h-screen overflow-hidden'>
+                        <video ref={videoRef} autoPlay playsInline  width="200" height="120" className='absolute left-0 m-5 rounded-md z-10 '></video>
+                        <MapContainer 
+                            center={[51.505, -0.09]} 
+                            zoom={18} 
+                            scrollWheelZoom={true} 
+                            style={{ height: '100%', width: '100%' , position:'absolute',zIndex:'0'}}
+                        >
+                            <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            <LocateUser /> {/* Komponen untuk menemukan lokasi pengguna */}
+                        </MapContainer>
+                    </div>
+
+                    <div className='w-[30%] h-screen bg-slate-200 flex flex-col items-center justify-around'>
+                        <div>
+                            <h2>Story:</h2>
+                        </div>
+                        <main className='overflow-y-auto w-full p-5'>
+                            {story.map((message, index) => (
+                                <div
+                                    key={index}
+                                    className={`mb-2 p-3 rounded-lg shadow ${
+                                        message.type === 'system'
+                                            ? 'bg-gray-300 text-left'
+                                            : 'bg-blue-500 text-white text-right'
+                                    }`}
+                                >
+                                    <Typewriter text={message.text} delay={typingSpeed} />
+                                </div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                            
+                        </main>
+
+                        <div>
+                            <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
+                            {/* <button onClick={toggleFunctions} className='bg-green-500 text-white px-5 py-3 rounded-lg'>{isActive ? 'Stop' : 'Start'}</button> */}
+                        </div>
+                    </div>
+                    <div>
+                    </div>
+                    <canvas ref={canvasRef} width="640" height="480" style={{ display:'none' }}></canvas>
+                </main>:
+                <main className='block '>
                     <menu className=' bg-blue-500 w-full fixed h-[50px] flex justify-center gap-5 text-white '>
                         <button className=' cursor-pointer' onClick={toDetectionMenu}>detection</button>
                         <button className='cursor-pointer' onClick={toNavigationMenu}>navigation</button>
@@ -328,7 +396,7 @@ function App() {
                     <div className="container pt-12  w-full h-screen">
                         {menu ? 
                         <div className='bg-gray-200'>
-                            {/* <video ref={videoRef} autoPlay playsInline  width="full" height="full" className='bg-red-500'></video> */}
+                            <video ref={videoRef} autoPlay playsInline   width="full" height="full" className='bg-red-500'></video>
                         </div>
                         :
                         <div>
@@ -364,63 +432,29 @@ function App() {
                             </div>
                             <div className='flex justify-center gap-5 w-full'>
                                 <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
-                                <button onClick={toggleFunctions} className='bg-green-500 text-white px-5 py-3 rounded-lg'>{isActive ? 'Stop' : 'Start'}</button>
+                                {/* <button onClick={toggleFunctions} className='bg-green-500 text-white px-5 py-3 rounded-lg'>{isActive ? 'Stop' : 'Start'}</button> */}
                             </div>
                         </div>
                     </div>
                     
                 </main>
-                <main className='hidden  w-full h-screen md:flex justify-between items-center'>
-                    <div className='relative w-[70%] h-screen overflow-hidden'>
-                        <video ref={videoRef} autoPlay playsInline width="200" height="120" className='absolute left-0 m-5 rounded-md z-10'></video>
-                        <MapContainer 
-                            center={[51.505, -0.09]} 
-                            zoom={18} 
-                            scrollWheelZoom={true} 
-                            style={{ height: '100%', width: '100%' , position:'absolute',zIndex:'0'}}
-                        >
-                            <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            />
-                            <LocateUser /> {/* Komponen untuk menemukan lokasi pengguna */}
-                        </MapContainer>
-                    </div>
-
-                    <div className='w-[30%] h-screen bg-slate-200 flex flex-col items-center justify-around'>
-                        <div>
-                            <h2>Story:</h2>
-                        </div>
-                        <main className='overflow-y-auto w-full p-5'>
-                            {story.map((message, index) => (
-                                <div
-                                    key={index}
-                                    className={`mb-2 p-3 rounded-lg shadow ${
-                                        message.type === 'system'
-                                            ? 'bg-gray-300 text-left'
-                                            : 'bg-blue-500 text-white text-right'
-                                    }`}
-                                >
-                                    <Typewriter text={message.text} delay={typingSpeed} />
-                                </div>
-                            ))}
-                            <div ref={messagesEndRef} />
-                            {isRecognizing && <p>Listening...</p>}
-                        </main>
-
-                        <div>
-                            <button onClick={switchCamera} className='bg-blue-500 text-white px-5 py-3 rounded-lg'>Switch Camera</button>
-                            {/* <button onClick={toggleFunctions} className='bg-green-500 text-white px-5 py-3 rounded-lg'>{isActive ? 'Stop' : 'Start'}</button> */}
-                        </div>
-                    </div>
-                    <div>
-                    </div>
-                    <canvas ref={canvasRef} width="640" height="480" style={{ display:'none' }}></canvas>
-                </main>
+                }
+                
+                
                 </div>
             )}
         </div>
     );
+}
+
+const SpeakModal = () => {
+    return (
+        <div className='absolute w-full z-50 h-full flex justify-center items-center'>
+            <div className='w-[300px] h-[200px] bg-blue-400 grid place-items-center'>
+                <h1>Speak</h1>
+            </div>
+        </div>
+    )
 }
 
 
